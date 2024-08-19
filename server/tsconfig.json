@@ -1,3 +1,24 @@
 {
-  "extends": "../.nuxt/tsconfig.server.json"
+    "extends": "../.nuxt/tsconfig.server.json",
+    "compilerOptions": {
+        "experimentalDecorators": true, // Enable experimental support for decorators
+        "emitDecoratorMetadata": true,
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "strict": true,
+        "jsx": "preserve",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["./*"],
+            "~/*": ["./*"]
+        },
+        "types": ["@nuxt/types", "@nuxt/typescript-build", "node"],
+        "noImplicitAny": true,
+        "strictNullChecks": false
+    }
 }

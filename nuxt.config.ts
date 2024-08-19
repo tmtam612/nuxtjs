@@ -11,4 +11,5 @@ export default defineNuxtConfig({
         },
     },
     css: ['~/assets/css/main.css'],
+    plugins: ['~/server/sequelize/index.ts'],
 });

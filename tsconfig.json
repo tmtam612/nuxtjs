@@ -2,9 +2,11 @@
     // https://nuxt.com/docs/guide/concepts/typescript
     "extends": "./.nuxt/tsconfig.json",
     "compilerOptions": {
+        "experimentalDecorators": true, // Enable experimental support for decorators
+        "emitDecoratorMetadata": true,
         "target": "esnext",
         "module": "esnext",
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "strict": true,
         "jsx": "preserve",
         "esModuleInterop": true,
@@ -16,8 +18,20 @@
             "@/*": ["./*"],
             "~/*": ["./*"]
         },
-        "types": ["@nuxt/types", "@nuxt/typescript-build", "node"]
+        "types": ["@nuxt/types", "@nuxt/typescript-build", "node"],
+        "noImplicitAny": true,
+        "strictNullChecks": false
     },
-    "include": ["nuxt.config.ts", "**/*.ts", "**/*.vue"],
+    "include": [
+        "nuxt.config.ts",
+        "**/*.ts",
+        "**/*.vue",
+        "**/*",
+        "pages/**/*",
+        "pages/*.vue",
+        "env.d.ts",
+        ".nuxt/nuxt.d.ts",
+        "**/*"
+    ],
     "exclude": ["node_modules", ".nuxt", "dist"]
 }
