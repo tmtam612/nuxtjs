@@ -72,4 +72,21 @@ yarn preview
 bun run preview
 ```
 
+Create Primsa:
+
+```bash
+# initialize
+npx prisma init
+
+# pull db
+Update DATABASE_URL in the .env
+npx primsa db pull
+
+# generate Prisma Client
+npx prisma generate
+
+# create migration
+npx prisma migrate dev
+```
+
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.

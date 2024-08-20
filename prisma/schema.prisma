@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model edges {
+  id                        BigInt   @id
+  source                    BigInt
+  target                    BigInt
+  sourceHandle              String?  @db.Char
+  targetHandle              String?  @db.Char
+  animated                  Boolean?
+}
+
+model nodes {
+  id                        BigInt  @id
+  type                      String  @db.Char
+  label                     String  @db.Char
+  positionX                 BigInt
+  positionY                 BigInt
+  data                      Json?
+}
+
+model roadmap {
+  id      BigInt  @id
+  Graph   Json
+  UserID  String  @db.Char
+  deleted Boolean
+}
