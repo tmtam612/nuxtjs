@@ -11,6 +11,10 @@ const counter = ref(0);
             type="target"
             :position="data.targetPosition ? data.targetPosition : 'left'"
         />
+        <!-- <Handle
+            type="target"
+            :position="data.targetPosition === 'left' ? 'right' : 'left'"
+        /> -->
         <div class="title">
             <button @click="counter++">{{ label }}</button>
         </div>

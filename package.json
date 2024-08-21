@@ -15,7 +15,7 @@
     "@prisma/client": "^5.18.0",
     "@vue-flow/background": "^1.3.0",
     "@vue-flow/controls": "^1.1.2",
-    "@vue-flow/core": "^1.39.3",
+    "@vue-flow/core": "^1.40.1",
     "@vue-flow/minimap": "^1.5.0",
     "@vue/compiler-sfc": "^3.4.38",
     "consola": "^3.2.3",

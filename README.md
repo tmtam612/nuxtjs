@@ -80,7 +80,7 @@ npx prisma init
 
 # pull db
 Update DATABASE_URL in the .env
-npx primsa db pull
+npx prisma db pull
 
 # generate Prisma Client
 npx prisma generate

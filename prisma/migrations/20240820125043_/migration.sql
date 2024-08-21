@@ -1,10 +1,10 @@
 -- CreateTable
 CREATE TABLE "edges" (
-    "id" BIGINT NOT NULL,
-    "source" BIGINT NOT NULL,
-    "target" BIGINT NOT NULL,
-    "sourceHandle" CHAR,
-    "targetHandle" CHAR,
+    "id" SERIAL NOT NULL,
+    "source" VARCHAR(256) NOT NULL,
+    "target" VARCHAR(256) NOT NULL,
+    "sourceHandle" VARCHAR(256),
+    "targetHandle" VARCHAR(256),
     "animated" BOOLEAN,
 
     CONSTRAINT "edges_pkey" PRIMARY KEY ("id")
@@ -12,11 +12,10 @@ CREATE TABLE "edges" (
 
 -- CreateTable
 CREATE TABLE "nodes" (
-    "id" BIGINT NOT NULL,
-    "type" CHAR NOT NULL,
-    "label" CHAR NOT NULL,
-    "positionX" BIGINT NOT NULL,
-    "positionY" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "type" VARCHAR(256) NOT NULL,
+    "label" VARCHAR(256) NOT NULL,
+    "position" JSONB,
     "data" JSONB,
 
     CONSTRAINT "nodes_pkey" PRIMARY KEY ("id")
@@ -24,7 +23,7 @@ CREATE TABLE "nodes" (
 
 -- CreateTable
 CREATE TABLE "roadmap" (
-    "id" BIGINT NOT NULL,
+    "id" INTEGER NOT NULL,
     "Graph" JSONB NOT NULL,
     "UserID" CHAR NOT NULL,
     "deleted" BOOLEAN NOT NULL,
