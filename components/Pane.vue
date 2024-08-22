@@ -70,11 +70,10 @@ import { Panel } from '@vue-flow/core';
 const category = ref('');
 const isActive = ref(false);
 const rules = ref([(value: string) => !!value || 'Required.']);
-console.log(rules.value);
+const emit = defineEmits(['updateCategory']);
 const save = () => {
-    console.log(rules);
-    console.log(rules.value);
     isActive.value = false;
+    emit('updateCategory', 1);
 };
 </script>
 

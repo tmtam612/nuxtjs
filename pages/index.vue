@@ -6,22 +6,10 @@ import { useScreenshot } from '../utils/useScreenshot';
 const { onDragOver, onDrop, onDragLeave, isDragOver } = useDragAndDrop();
 const { capture } = useScreenshot();
 const { toObject, addEdges, onConnect, vueFlowRef, fromObject } = useVueFlow();
-interface response {
-    statusCode: number; // or whatever type you need
-    payload: ResponsePayload | null; // or whatever type you need
-    message: string; // or whatever type you need
-}
-interface ResponsePayload {
-    nodes: Node[];
-    edges: Edge[];
-}
-const response: response = await $fetch('/api/get-graph');
-let init = false;
-if (response.statusCode === 200 && response.payload && response.payload.Graph) {
-    console.log(typeof response.payload.Graph);
-    fromObject(response.payload.Graph);
-    init = true;
-}
+const category = ref<number | null>(null);
+const updateCategory = (value: number) => {
+    category.value = value;
+};
 async function onSave() {
     await $fetch('/api/save-graph', {
         method: 'post',
@@ -57,12 +45,11 @@ function doScreenshot() {
 }
 
 function onPaneChange(changes: any) {
-    if (changes && changes.length > 0 && !snackbar.value && !init) {
+    if (changes && changes.length > 0 && !snackbar.value) {
         if (changes[0].type !== 'select') {
             snackbar.value = true;
         }
     }
-    init = false;
 }
 </script>
 
@@ -89,7 +76,7 @@ function onPaneChange(changes: any) {
                 >
                     <p v-if="isDragOver">Drop here</p>
                 </DropzoneBackground> -->
-                <Pane />
+                <Pane :onUpdateCategory="updateCategory" />
                 <template #node-custom="nodeProps">
                     <CustomNode v-bind="nodeProps" />
                 </template>
@@ -98,7 +85,7 @@ function onPaneChange(changes: any) {
                     <ParentNode v-bind="nodeProps" />
                 </template>
             </VueFlow>
-            <Sidebar />
+            <Sidebar :category="category" />
             <v-snackbar v-model="snackbar" timeout="-1">
                 you have change the map, please press save to make sure save the
                 change

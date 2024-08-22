@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { Position, Handle } from '@vue-flow/core';
 import { NodeResizer } from '@vue-flow/node-resizer';
 // props were passed from the slot using `v-bind="customNodeProps"`
-const props = defineProps(['label', 'data']);
+defineProps(['label', 'data']);
 const enableInput = ref(false);
 const title = ref('Milestone');
 let oldValue = title.value;
