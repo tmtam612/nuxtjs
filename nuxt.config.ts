@@ -1,5 +1,4 @@
 import { defineNuxtConfig } from 'nuxt/config';
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     compatibilityDate: '2024-04-03',
@@ -10,5 +9,20 @@ export default defineNuxtConfig({
             autoprefixer: {},
         },
     },
-    css: ['~/assets/css/main.css'],
+    css: [
+        '~/assets/css/main.css',
+        'vuetify/styles/main.sass',
+        '@mdi/font/css/materialdesignicons.css',
+    ],
+    build: {
+        transpile: ['vuetify'],
+    },
+    // vuetify: {
+    // 	moduleOptions: {
+    // 		/* module specific options */
+    // 	},
+    // 	vuetifyOptions: {
+    // 		/* vuetify options */
+    // 	},
+    // },
 });

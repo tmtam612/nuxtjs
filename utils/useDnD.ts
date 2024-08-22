@@ -6,8 +6,8 @@ let id = 0;
 /**
  * @returns {string} - A unique id.
  */
-function getId() {
-    return `dndnode_${id++}`;
+function getId(type: string) {
+    return `${type}_${id++}`;
 }
 
 /**
@@ -84,15 +84,16 @@ export default function useDragAndDrop() {
             y: event.clientY,
         });
 
-        const nodeId = getId();
+        const nodeId = getId(draggedType.value);
 
         const newNode = {
             id: nodeId,
             type: draggedType.value,
             position,
-            data: { label: nodeId },
+            data: {
+                label: draggedType.value === 'parent' ? 'Milestone' : 'Content',
+            },
         };
-
         /**
          * Align node position after drop, so it's centered to the mouse
          *

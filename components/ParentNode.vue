@@ -1,14 +1,19 @@
-<script lang="ts" setup>
-import { Handle, Position } from '@vue-flow/core';
+<script setup>
 import { ref } from 'vue';
+import { Position, Handle } from '@vue-flow/core';
 import { NodeResizer } from '@vue-flow/node-resizer';
-defineProps(['label', 'data']);
-const counter = ref(0);
+// props were passed from the slot using `v-bind="customNodeProps"`
+const props = defineProps(['label', 'data']);
+// const enableInput = ref(false);
+// function test() {
+//     enableInput.value = true;
+// 	console.log(enableInput);
+// }
 </script>
 
 <template>
-    <div>
-        <NodeResizer :minHeight="60" :minWidth="250" class="z-10"></NodeResizer>
+    <div class="resize" style="resize: auto; height: 100%">
+        <NodeResizer min-height="50" min-width="250" class="z-10"></NodeResizer>
         <Handle
             id="target-a"
             type="target"
@@ -21,15 +26,11 @@ const counter = ref(0);
             :position="Position.Bottom"
             class="z-10"
         />
-        <v-card class="m-auto inline-flex" color="blue">
-            <template v-slot:title>
-                <v-icon icon="mdi-server-plus" start></v-icon>
-                <span class="">Content</span>
+        <v-card class="m-auto inline-flex h-auto" color="orange"
+            ><template v-slot:title>
+                <v-icon icon="mdi-shield-star" start color="white"></v-icon>
+                <span class="">Milestone</span>
             </template>
-
-            <v-card-text class="bg-surface-light pt-4">
-                Here is information about the lesson
-            </v-card-text>
         </v-card>
         <Handle
             id="source-a"
