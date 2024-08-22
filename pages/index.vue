@@ -1,21 +1,11 @@
 <script lang="ts" setup>
-import { h, ref } from 'vue';
-import { Background } from '@vue-flow/background';
-import { Controls } from '@vue-flow/controls';
-import { MiniMap } from '@vue-flow/minimap';
-import {
-    Position,
-    VueFlow,
-    useVueFlow,
-    type Node,
-    type Edge,
-    type Connection,
-} from '@vue-flow/core';
+import { ref } from 'vue';
+import { VueFlow, useVueFlow, type Node, type Edge } from '@vue-flow/core';
 import useDragAndDrop from '../utils/useDnD';
 import { useScreenshot } from '../utils/useScreenshot';
 const { onDragOver, onDrop, onDragLeave, isDragOver } = useDragAndDrop();
 const { capture } = useScreenshot();
-const { toObject, addEdges, onConnect, vueFlowRef } = useVueFlow();
+const { toObject, addEdges, onConnect, vueFlowRef, fromObject } = useVueFlow();
 interface response {
     statusCode: number; // or whatever type you need
     payload: ResponsePayload | null; // or whatever type you need
@@ -26,21 +16,34 @@ interface ResponsePayload {
     edges: Edge[];
 }
 const response: response = await $fetch('/api/get-graph');
+let init = false;
+if (response.statusCode === 200 && response.payload && response.payload.Graph) {
+    console.log(typeof response.payload.Graph);
+    fromObject(response.payload.Graph);
+    init = true;
+}
 async function onSave() {
     await $fetch('/api/save-graph', {
         method: 'post',
         body: JSON.stringify(toObject()),
     });
+    snackbar.value = false;
 }
-
-const nodes =
-    response && response.payload && response.payload.nodes
-        ? ref<Node[]>(response.payload.nodes)
-        : ref<Node[]>([]);
-const edges =
-    response && response.payload && response.payload.edges
-        ? ref<Edge[]>(response.payload.edges)
-        : ref<Edge[]>([]);
+const snackbar = ref(false);
+const nodes = ref<Node[]>([]);
+// response &&
+// response.payload &&
+// response.payload.Graph &&
+// response.payload.Graph.nodes
+//     ? ref<Node[]>(response.payload.Graph.nodes)
+//     : ref<Node[]>([]);
+const edges = ref<Edge[]>([]);
+// response &&
+// response.payload &&
+// response.payload.Graph &&
+// response.payload.Graph.edges
+//     ? ref<Edge[]>(response.payload.Graph.edges)
+//     : ref<Edge[]>([]);
 onConnect((params) => {
     addEdges([params]);
 });
@@ -52,30 +55,41 @@ function doScreenshot() {
 
     capture(vueFlowRef.value, { shouldDownload: true });
 }
+
+function onPaneChange(changes: any) {
+    if (changes && changes.length > 0 && !snackbar.value && !init) {
+        if (changes[0].type !== 'select') {
+            snackbar.value = true;
+        }
+    }
+    init = false;
+}
 </script>
 
 <template>
     <ClientOnly>
         <div style="height: 100vh" class="dnd-flow" @drop="onDrop">
-            <!-- <button @click="onSave">Save me</button> -->
             <VueFlow
                 :nodes="nodes"
                 :edges="edges"
-                :default-viewport="{ zoom: 1 }"
+                :default-viewport="{ zoom: 0.8 }"
                 :max-zoom="4"
                 :min-zoom="0.1"
                 @dragover="(event: DragEvent) => onDragOver(event)"
                 @dragleave="onDragLeave"
                 auto-connect
+                @nodesChange="onPaneChange"
+                @edgesChange="onPaneChange"
             >
-                <DropzoneBackground
+                <!-- <DropzoneBackground
                     :style="{
                         backgroundColor: isDragOver ? '#e7f3ff' : 'transparent',
                         transition: 'background-color 0.2s ease',
                     }"
                 >
                     <p v-if="isDragOver">Drop here</p>
-                </DropzoneBackground>
+                </DropzoneBackground> -->
+                <Pane />
                 <template #node-custom="nodeProps">
                     <CustomNode v-bind="nodeProps" />
                 </template>
@@ -85,6 +99,19 @@ function doScreenshot() {
                 </template>
             </VueFlow>
             <Sidebar />
+            <v-snackbar v-model="snackbar" timeout="-1">
+                you have change the map, please press save to make sure save the
+                change
+
+                <template v-slot:actions>
+                    <v-btn color="green" variant="text" @click="onSave">
+                        Save
+                    </v-btn>
+                    <v-btn color="red" variant="text" @click="snackbar = false">
+                        Close
+                    </v-btn>
+                </template>
+            </v-snackbar>
         </div>
     </ClientOnly>
 </template>

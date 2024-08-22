@@ -5,3 +5,30 @@
 .v-card-item__content {
     margin: auto;
 }
+.vue-flow__resize-control {
+    z-index: 2;
+    border-width: 6px !important;
+    border-color: transparent !important;
+    background-color: transparent !important;
+}
+.vue-flow__resize-control .handle {
+    z-index: 2;
+    width: 15px !important;
+    height: 15px !important;
+}
+.vue-flow__handle {
+    background: transparent !important;
+    border: none !important;
+    width: 20px !important;
+    height: 20px !important;
+}
+.vue-flow__edge-path {
+    stroke: black !important;
+    stroke-width: 0.8px !important;
+}
+.border-strong-black {
+    border: 1px solid black !important;
+}
+.border-top-strong-black {
+    border-top: 1px solid black !important;
+}

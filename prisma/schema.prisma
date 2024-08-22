@@ -8,25 +8,27 @@ datasource db {
 }
 
 model edges {
-  id           Int      @id @default(autoincrement())
-  source       String   @db.VarChar(256)
-  target       String   @db.VarChar(256)
-  sourceHandle String?  @db.VarChar(256)
-  targetHandle String?  @db.VarChar(256)
-  animated     Boolean?
+  id    Int  @id @default(autoincrement())
+  Graph Json
 }
 
 model nodes {
-  id       Int    @id @default(autoincrement())
-  type     String @db.VarChar(256)
-  label    String @db.VarChar(256)
-  position Json?
-  data     Json?
+  id    Int  @id @default(autoincrement())
+  Graph Json
 }
 
-model roadmap {
-  id      Int     @id
-  Graph   Json
-  UserID  String  @db.Char
-  deleted Boolean
+model graphs {
+  id        Int      @id @default(autoincrement())
+  UserID    String   @db.VarChar(256)
+  name      String   @db.VarChar(256)
+  createdAt DateTime
+  updatedAt DateTime
+  createdBy String   @db.VarChar(256)
+  updatedBy String   @db.VarChar(256)
+  deleted   Boolean
+}
+
+model dimensions {
+  id    Int  @id @default(autoincrement())
+  Graph Json
 }

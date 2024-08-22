@@ -4,16 +4,26 @@ import { Position, Handle } from '@vue-flow/core';
 import { NodeResizer } from '@vue-flow/node-resizer';
 // props were passed from the slot using `v-bind="customNodeProps"`
 const props = defineProps(['label', 'data']);
-// const enableInput = ref(false);
-// function test() {
-//     enableInput.value = true;
-// 	console.log(enableInput);
-// }
+const enableInput = ref(false);
+const title = ref('Milestone');
+let oldValue = title.value;
+function applyNewValue() {
+    oldValue = title.value;
+    enableInput.value = false;
+}
+function cancelChange() {
+    title.value = oldValue;
+    enableInput.value = false;
+}
 </script>
 
 <template>
-    <div class="resize" style="resize: auto; height: 100%">
-        <NodeResizer min-height="50" min-width="250" class="z-10"></NodeResizer>
+    <div class="rounded-sm h-full parent-node">
+        <NodeResizer
+            min-height="80"
+            min-width="300"
+            class="rounded-sm parent-node"
+        ></NodeResizer>
         <Handle
             id="target-a"
             type="target"
@@ -26,10 +36,52 @@ const props = defineProps(['label', 'data']);
             :position="Position.Bottom"
             class="z-10"
         />
-        <v-card class="m-auto inline-flex h-auto" color="orange"
-            ><template v-slot:title>
-                <v-icon icon="mdi-shield-star" start color="white"></v-icon>
-                <span class="">Milestone</span>
+        <v-card
+            class="inline-flex h-full w-full"
+            color="black"
+            variant="outlined"
+        >
+            <template v-slot:title>
+                <div class="flex flex-row">
+                    <div class="basis-5/6">
+                        <div v-show="!enableInput" class="mt-2">
+                            <span class="text-2xl">{{ title }}</span>
+                        </div>
+                        <v-text-field
+                            v-if="enableInput"
+                            label="Milestone"
+                            variant="underlined"
+                            type="input"
+                            clearable
+                            v-model="title"
+                        ></v-text-field>
+                    </div>
+                    <div class="basis-1/6">
+                        <v-btn
+                            v-if="!enableInput"
+                            icon="mdi-pencil"
+                            variant="text"
+                            @click="enableInput = true"
+                            :ripple="false"
+                        ></v-btn>
+                        <v-btn
+                            v-if="enableInput"
+                            icon="mdi-checkbox-marked-circle"
+                            variant="text"
+                            :ripple="false"
+                            @click="applyNewValue"
+                            class="mt-2"
+                        ></v-btn>
+                        <v-btn
+                            v-if="enableInput"
+                            icon="mdi-cancel"
+                            variant="text"
+                            :ripple="false"
+                            @click="cancelChange"
+                            class="mt-2"
+                        ></v-btn>
+                    </div>
+                </div>
             </template>
         </v-card>
         <Handle
@@ -46,3 +98,8 @@ const props = defineProps(['label', 'data']);
         />
     </div>
 </template>
+<style>
+.v-card-item__content {
+    width: 100%;
+}
+</style>

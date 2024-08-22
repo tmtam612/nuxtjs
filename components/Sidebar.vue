@@ -2,16 +2,22 @@
 import useDragAndDrop from '../utils/useDnD';
 
 const { onDragStart } = useDragAndDrop();
+const show = ref(false);
 </script>
 
 <template>
-    <aside>
+    <aside v-if="show">
         <div class="text-2xl bg-cyan-darken-1 pl-2 h-14">
-            <v-app-bar-nav-icon></v-app-bar-nav-icon>
+            <!-- <v-app-bar-nav-icon></v-app-bar-nav-icon> -->
+            <v-btn
+                icon="mdi-close"
+                variant="text"
+                @click="show = false"
+            ></v-btn>
             <span class="mt-2">Menu</span>
         </div>
         <br />
-        <div class="description mt-5 mx-4">
+        <div class="description mt-2 mx-4">
             You can drag these nodes to the pane.
         </div>
 
@@ -21,13 +27,12 @@ const { onDragStart } = useDragAndDrop();
                 @dragstart="onDragStart($event, 'parent')"
                 class="mt-5 mx-4"
             >
-                <v-card class="m-auto inline-flex" color="orange"
-                    ><template v-slot:title>
-                        <v-icon
-                            icon="mdi-shield-star"
-                            start
-                            color="white"
-                        ></v-icon>
+                <v-card
+                    class="m-auto inline-flex bg-white"
+                    color="black"
+                    variant="outlined"
+                >
+                    <template v-slot:title>
                         <span class="">Milestone</span>
                     </template>
                 </v-card>
@@ -38,19 +43,26 @@ const { onDragStart } = useDragAndDrop();
                 @dragstart="onDragStart($event, 'custom')"
                 class="mt-6 mx-4"
             >
-                <v-card class="m-auto inline-flex" color="blue">
+                <v-card
+                    class="m-auto inline-flex border-strong-black"
+                    color="yellow"
+                >
                     <template v-slot:title>
-                        <v-icon icon="mdi-server-plus" start></v-icon>
                         <span class="">Content</span>
                     </template>
 
-                    <v-card-text class="bg-surface-light pt-4">
+                    <v-card-text
+                        class="bg-surface-light pt-4 h-24 border-top-strong-black"
+                    >
                         Here is information about the lesson
                     </v-card-text>
                 </v-card>
             </div>
         </div>
     </aside>
+    <div v-else class="mr-4 mt-4">
+        <v-btn icon="mdi-menu" @click="show = true" color="blue"></v-btn>
+    </div>
 </template>
 <style>
 .dnd-flow aside {
