@@ -3,7 +3,7 @@ import useDragAndDrop from '../utils/useDnD';
 
 const { onDragStart } = useDragAndDrop();
 const show = ref(false);
-defineProps(['category']);
+const props = defineProps(['category']);
 </script>
 
 <template>
@@ -63,7 +63,7 @@ defineProps(['category']);
     </aside>
     <div v-else class="mr-4 mt-4">
         <v-btn
-            icon="mdi-menu"
+            icon="mdi-pencil"
             @click="show = true"
             color="blue"
             v-if="category"

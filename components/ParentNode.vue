@@ -2,26 +2,27 @@
 import { ref } from 'vue';
 import { Position, Handle } from '@vue-flow/core';
 import { NodeResizer } from '@vue-flow/node-resizer';
-// props were passed from the slot using `v-bind="customNodeProps"`
 defineProps(['label', 'data']);
-const enableInput = ref(false);
 const title = ref('Milestone');
-let oldValue = title.value;
-function applyNewValue() {
-    oldValue = title.value;
-    enableInput.value = false;
-}
-function cancelChange() {
-    title.value = oldValue;
-    enableInput.value = false;
-}
+const link = ref('https://github.com/vuetifyjs/vuetify/');
+const showDetail = ref(false);
+const closeDialog = () => {
+    showDetail.value = false;
+};
 </script>
 
 <template>
     <div class="rounded-sm h-full parent-node">
+        <ContentDialog
+            :dialogVisible="showDetail"
+            @closeDialog="closeDialog"
+            :isMileStone="true"
+            :title="title"
+            :link="link"
+        />
         <NodeResizer
             min-height="80"
-            min-width="300"
+            min-width="310"
             class="rounded-sm parent-node"
         ></NodeResizer>
         <Handle
@@ -40,46 +41,14 @@ function cancelChange() {
             class="inline-flex h-full w-full"
             color="black"
             variant="outlined"
+            @click="showDetail = true"
         >
             <template v-slot:title>
                 <div class="flex flex-row">
                     <div class="basis-5/6">
-                        <div v-show="!enableInput" class="mt-2">
+                        <div class="mt-2">
                             <span class="text-2xl">{{ title }}</span>
                         </div>
-                        <v-text-field
-                            v-if="enableInput"
-                            label="Milestone"
-                            variant="underlined"
-                            type="input"
-                            clearable
-                            v-model="title"
-                        ></v-text-field>
-                    </div>
-                    <div class="basis-1/6">
-                        <v-btn
-                            v-if="!enableInput"
-                            icon="mdi-pencil"
-                            variant="text"
-                            @click="enableInput = true"
-                            :ripple="false"
-                        ></v-btn>
-                        <v-btn
-                            v-if="enableInput"
-                            icon="mdi-checkbox-marked-circle"
-                            variant="text"
-                            :ripple="false"
-                            @click="applyNewValue"
-                            class="mt-2"
-                        ></v-btn>
-                        <v-btn
-                            v-if="enableInput"
-                            icon="mdi-cancel"
-                            variant="text"
-                            :ripple="false"
-                            @click="cancelChange"
-                            class="mt-2"
-                        ></v-btn>
                     </div>
                 </div>
             </template>
