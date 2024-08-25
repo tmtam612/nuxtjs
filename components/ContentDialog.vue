@@ -61,7 +61,6 @@ function handleUpdate(type, newValue) {
     }
 }
 const deleteNode = (id) => {
-    console.log(id);
     emit('deleteNode', id);
 };
 </script>

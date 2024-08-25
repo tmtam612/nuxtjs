@@ -10,7 +10,6 @@ const closeDialog = () => {
     showDetail.value = false;
 };
 const deleteNode = (id) => {
-    console.log(id);
     emit('deleteNode', id);
 };
 function updateData(form) {
