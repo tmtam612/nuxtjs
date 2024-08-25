@@ -26,8 +26,13 @@ const state = {
 export default function useDragAndDrop() {
     const { draggedType, isDragOver, isDragging } = state;
 
-    const { addNodes, screenToFlowCoordinate, onNodesInitialized, updateNode } =
-        useVueFlow();
+    const {
+        addNodes,
+        screenToFlowCoordinate,
+        onNodesInitialized,
+        updateNode,
+        getNodes,
+    } = useVueFlow();
 
     watch(isDragging, (dragging) => {
         document.body.style.userSelect = dragging ? 'none' : '';
@@ -88,10 +93,15 @@ export default function useDragAndDrop() {
 
         const newNode = {
             id: nodeId,
-            type: draggedType.value,
+            type: 'customNode',
             position,
             data: {
-                label: draggedType.value === 'parent' ? 'Milestone' : 'Content',
+                title: draggedType.value === 'parent' ? 'Milestone' : 'Content',
+                order_no: 1,
+                content: 'Here is information about the lesson',
+                lessons: [],
+                link: '',
+                type: draggedType.value,
             },
         };
         /**
@@ -113,6 +123,10 @@ export default function useDragAndDrop() {
         addNodes(newNode);
     }
 
+    function getAllNodes() {
+        return getNodes.value;
+    }
+
     return {
         draggedType,
         isDragOver,
@@ -121,5 +135,6 @@ export default function useDragAndDrop() {
         onDragLeave,
         onDragOver,
         onDrop,
+        getAllNodes,
     };
 }

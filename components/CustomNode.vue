@@ -3,14 +3,15 @@ import { Handle, Position } from '@vue-flow/core';
 import { ref } from 'vue';
 import { NodeResizer } from '@vue-flow/node-resizer';
 import ContentDialog from './ContentDialog';
-defineProps(['label', 'data']);
+const props = defineProps(['data', 'id']);
 const showDetail = ref(false);
-const title = ref('Content');
-const content = ref('Here is information about the lesson');
-const link = ref('https://github.com/vuetifyjs/vuetify/');
+const emit = defineEmits(['update-node']);
 const closeDialog = () => {
     showDetail.value = false;
 };
+function updateData(form) {
+    emit('update-node', { ...form, id: props.id });
+}
 </script>
 
 <template>
@@ -18,14 +19,13 @@ const closeDialog = () => {
         <ContentDialog
             :dialogVisible="showDetail"
             @closeDialog="closeDialog"
-            :isMileStone="false"
-            :title="title"
-            :link="link"
-            :content="content"
+            :isMileStone="data.type === 'parent'"
+            :infoDetail="data"
+            @updateData="updateData"
         />
         <NodeResizer
-            min-height="200"
-            min-width="200"
+            :minHeight="data.type === 'parent' ? 80 : 200"
+            :minWidth="data.type === 'parent' ? 310 : 200"
             class="rounded-sm content-node"
         ></NodeResizer>
         <Handle
@@ -41,14 +41,20 @@ const closeDialog = () => {
             class="z-10"
         />
         <v-card
-            class="m-auto inline-flex h-full border-strong-black"
+            class="inline-flex h-full border-strong-black w-full"
             color="yellow"
+            :ripple="false"
             @click="showDetail = true"
+            v-if="data.type !== 'parent'"
         >
             <template v-slot:title>
                 <div class="flex flex-row">
-                    <div class="mt-2">
-                        <span class="text-2xl">{{ title }}</span>
+                    <div class="pl-5">
+                        <div class="mt-2">
+                            <span class="text-3xl text-wrap break-words">{{
+                                data.order_no + '. ' + data.title
+                            }}</span>
+                        </div>
                     </div>
                 </div>
             </template>
@@ -56,10 +62,36 @@ const closeDialog = () => {
             <v-card-text
                 class="bg-surface-light pt-2 h-full border-top-strong-black whitespace-normal"
             >
-                <div class="block break-words">
-                    <span class="text-2xl">{{ content }}</span>
+                <div class="block text-wrap break-words">
+                    <span class="text-2xl">{{ data.content }}</span>
+                </div>
+                <div v-if="data.type !== 'parent'">
+                    <v-list
+                        :items="data.lessons"
+                        class="bg-surface-light"
+                    ></v-list>
                 </div>
             </v-card-text>
+        </v-card>
+        <v-card
+            class="inline-flex h-full w-full"
+            color="black"
+            variant="outlined"
+            @click="showDetail = true"
+            :ripple="false"
+            v-else
+        >
+            <template v-slot:title>
+                <div class="flex flex-row">
+                    <div class="pl-5">
+                        <div class="mt-2">
+                            <span class="text-3xl">{{
+                                data.order_no + '. ' + data.title
+                            }}</span>
+                        </div>
+                    </div>
+                </div>
+            </template>
         </v-card>
         <Handle
             id="source-a"

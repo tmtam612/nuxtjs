@@ -1,21 +1,29 @@
-<script lang="ts" setup>
+<script setup>
 import { ref } from 'vue';
-const props = defineProps([
-    'dialogVisible',
-    'isMileStone',
-    'title',
-    'link',
-    'content',
-]);
+const props = defineProps(['dialogVisible', 'infoDetail', 'isMileStone']);
+const items = [
+    { id: 1, name: 'California' },
+    { id: 2, name: 'Colorado' },
+    { id: 3, name: 'Florida' },
+    { id: 4, name: 'Georgia' },
+    { id: 5, name: 'Texas' },
+    { id: 6, name: 'Wyoming' },
+];
+const formData = ref({
+    order_no: props.infoDetail.order_no ? props.infoDetail.order_no : '',
+    lessons: props.infoDetail.lessons ? props.infoDetail.lessons : '',
+    title: props.infoDetail.title ? props.infoDetail.title : '',
+    content: props.infoDetail.content ? props.infoDetail.content : '',
+});
 const formIsValid = ref(false);
-const { dialogVisible } = toRefs(props);
-const emit = defineEmits(['closeDialog']);
+const emit = defineEmits(['closeDialog', 'updateData']);
 const enableInput = ref(false);
 const rules = ref({
-    required: (value: string) => !!value || 'Required.',
-    validURL: (value: string) => isValidUrl(value) || 'Invalid URL.',
+    required: (value) => !!value || 'Required.',
+    validURL: (value) => isValidUrl(value) || 'Invalid URL.',
 });
-function isValidUrl(urlString: string) {
+function isValidUrl(urlString) {
+    if (urlString === '') return true;
     var urlPattern = new RegExp(
         '^(https?:\\/\\/)?' + // validate protocol
             '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // validate domain name
@@ -29,7 +37,7 @@ function isValidUrl(urlString: string) {
 }
 
 const internalDialogVisible = computed({
-    get: () => (dialogVisible ? dialogVisible.value : ''),
+    get: () => props.dialogVisible,
     set: (value) => {
         if (!value) {
             emit('closeDialog');
@@ -41,52 +49,69 @@ const closeDialog = () => {
     internalDialogVisible.value = false;
 };
 const submitForm = () => {
-    // Form submission logic
     if (formIsValid.value) {
-        console.log('Form submitted with:');
+        emit('updateData', formData.value);
+        closeDialog();
     }
 };
+function handleUpdate(type, newValue) {
+    if (formData) {
+        formData.value[type] = newValue;
+    }
+}
 </script>
 
 <template>
     <v-dialog
         transition="dialog-top-transition"
-        width="auto"
-        class="rounded min-w-60"
+        width="700"
+        class="rounded max-w-5xl"
         v-model="internalDialogVisible"
         @click:outside="closeDialog"
     >
         <v-form ref="form" v-model="formIsValid">
             <v-card
-                class="m-auto inline-flex h-full border-strong-black min-w-60"
+                class="m-auto inline-flex h-full border-strong-black w-full"
                 :color="!isMileStone ? (enableInput ? '' : 'yellow') : ''"
             >
                 <template v-slot:title>
-                    <div class="flex flex-row min-w-96">
-                        <div class="basis-5/6">
-                            <div v-if="!enableInput" class="mt-2">
-                                <span class="text-2xl">{{ title }}</span>
+                    <div class="flex flex-row" v-if="!enableInput">
+                        <div
+                            class="basis-4/6 whitespace-nowrap text-ellipsis overflow-hidden"
+                        >
+                            <div
+                                v-if="!enableInput"
+                                class="mt-2 whitespace-nowrap text-ellipsis overflow-hidden"
+                            >
+                                <span class="text-3xl"
+                                    >{{
+                                        infoDetail.order_no +
+                                        '. ' +
+                                        infoDetail.title
+                                    }}<v-tooltip
+                                        activator="parent"
+                                        location="bottom"
+                                        >{{
+                                            infoDetail.order_no +
+                                            '. ' +
+                                            infoDetail.title
+                                        }}</v-tooltip
+                                    ></span
+                                >
                             </div>
-                            <v-text-field
-                                v-if="enableInput"
-                                label="Title"
-                                variant="underlined"
-                                type="input"
-                                clearable
-                                ref="textField"
-                                :model-value="title"
-                                :rules="[rules.required]"
-                            ></v-text-field>
-                            <v-text-field
-                                v-if="enableInput"
-                                label="Link"
-                                variant="underlined"
-                                type="input"
-                                clearable
-                                ref="textField"
-                                :model-value="link"
-                                :rules="[rules.validURL]"
-                            ></v-text-field>
+                        </div>
+                        <div class="basis-1/6">
+                            <!-- <v-btn
+                                v-if="
+                                    !enableInput &&
+                                    infoDetail.link &&
+                                    infoDetail.link !== ''
+                                "
+                                icon="mdi-open-in-new"
+                                variant="text"
+                                :href="infoDetail.link"
+                                target="_blank"
+                            ></v-btn> -->
                         </div>
                         <div class="basis-1/6">
                             <v-btn
@@ -95,13 +120,15 @@ const submitForm = () => {
                                 variant="text"
                                 @click="enableInput = true"
                             ></v-btn>
-                            <v-btn
-                                v-if="!enableInput"
-                                icon="mdi-open-in-new"
-                                variant="text"
-                                :href="link"
-                                target="_blank"
-                            ></v-btn>
+                        </div>
+                    </div>
+                    <div v-else class="flex flex-row">
+                        <div class="pl-5">
+                            <div class="mt-2">
+                                <span class="text-3xl text-wrap break-words"
+                                    >Modify: {{ formData.title }}</span
+                                >
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -109,21 +136,75 @@ const submitForm = () => {
                 <v-card-text
                     :class="
                         enableInput
-                            ? 'bg-white h-full'
-                            : 'border-top-strong-black bg-surface-light pt-2 h-full'
+                            ? 'bg-white h-full border-top-strong-black pt-3 px-9'
+                            : 'border-top-strong-black bg-white pt-2 h-full whitespace-nowrap text-ellipsis overflow-hidden'
                     "
-                    v-if="!isMileStone"
+                    v-if="!isMileStone || enableInput"
                 >
-                    <div class="block">
-                        <span v-if="!enableInput" class="text-2xl">{{
-                            content
-                        }}</span>
+                    <v-text-field
+                        v-if="enableInput"
+                        label="Order No."
+                        variant="underlined"
+                        type="number"
+                        clearable
+                        ref="textField"
+                        :model-value="formData.order_no"
+                        @update:model-value="
+                            (newValue) => handleUpdate('order_no', newValue)
+                        "
+                        :rules="[rules.required]"
+                    ></v-text-field>
+                    <v-text-field
+                        v-if="enableInput"
+                        label="Title"
+                        variant="underlined"
+                        type="input"
+                        clearable
+                        ref="textField"
+                        :model-value="formData.title"
+                        @update:model-value="
+                            (newValue) => handleUpdate('title', newValue)
+                        "
+                        :rules="[rules.required]"
+                    ></v-text-field>
+                    <v-autocomplete
+                        label="Lessons"
+                        :items="items"
+                        item-title="name"
+                        :model-value="formData.lessons"
+                        multiple
+                        v-if="enableInput && !isMileStone"
+                        @update:modelValue="
+                            (newValue) => handleUpdate('lessons', newValue)
+                        "
+                        chips
+                        clearable
+                        closable-chips
+                    ></v-autocomplete>
+                    <div
+                        class="block whitespace-nowrap text-ellipsis overflow-hidden"
+                    >
+                        <span v-if="!enableInput" class="text-2xl"
+                            >{{ infoDetail.content }}
+                            <v-tooltip activator="parent" location="bottom">{{
+                                infoDetail.content
+                            }}</v-tooltip>
+                        </span>
+                        <div>
+                            <v-list
+                                :items="infoDetail.lessons"
+                                v-if="!isMileStone && !enableInput"
+                            ></v-list>
+                        </div>
                         <v-textarea
                             v-if="enableInput"
                             label="Content"
-                            :model-value="content"
+                            :model-value="formData.content"
                             class="h-full"
                             ref="textAreaField"
+                            @update:model-value="
+                                (newValue) => handleUpdate('content', newValue)
+                            "
                         ></v-textarea>
                     </div>
                 </v-card-text>

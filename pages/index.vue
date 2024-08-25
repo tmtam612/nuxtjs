@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { VueFlow, useVueFlow, type Node, type Edge } from '@vue-flow/core';
+import { VueFlow, useVueFlow } from '@vue-flow/core';
 import useDragAndDrop from '../utils/useDnD';
 import { useScreenshot } from '../utils/useScreenshot';
 const { onDragOver, onDrop, onDragLeave, isDragOver } = useDragAndDrop();
@@ -17,21 +17,8 @@ async function onSave() {
     });
     snackbar.value = false;
 }
+const elements = ref([]);
 const snackbar = ref(false);
-const nodes = ref<Node[]>([]);
-// response &&
-// response.payload &&
-// response.payload.Graph &&
-// response.payload.Graph.nodes
-//     ? ref<Node[]>(response.payload.Graph.nodes)
-//     : ref<Node[]>([]);
-const edges = ref<Edge[]>([]);
-// response &&
-// response.payload &&
-// response.payload.Graph &&
-// response.payload.Graph.edges
-//     ? ref<Edge[]>(response.payload.Graph.edges)
-//     : ref<Edge[]>([]);
 onConnect((params) => {
     addEdges([params]);
 });
@@ -51,14 +38,32 @@ function onPaneChange(changes: any) {
         }
     }
 }
+interface node {
+    id: string;
+    type: string;
+    position: any;
+    data: any;
+}
+function handleNodeUpdate(updatedData: any) {
+    const nodes: Array<node> = elements.value.filter(
+        (item: node) => item.type === 'customNode'
+    );
+    if (nodes.length > 0) {
+        const node = nodes.find((n: node) => n.id === updatedData.id);
+        if (node) {
+            node.data = { ...node.data, ...updatedData };
+            if (!snackbar.value) {
+                snackbar.value = true;
+            }
+        }
+    }
+}
 </script>
 
 <template>
     <ClientOnly>
         <div style="height: 100vh" class="dnd-flow" @drop="onDrop">
             <VueFlow
-                :nodes="nodes"
-                :edges="edges"
                 :default-viewport="{ zoom: 0.8 }"
                 :max-zoom="4"
                 :min-zoom="0.1"
@@ -67,6 +72,7 @@ function onPaneChange(changes: any) {
                 auto-connect
                 @nodesChange="onPaneChange"
                 @edgesChange="onPaneChange"
+                v-model="elements"
             >
                 <!-- <DropzoneBackground
                     :style="{
@@ -77,12 +83,11 @@ function onPaneChange(changes: any) {
                     <p v-if="isDragOver">Drop here</p>
                 </DropzoneBackground> -->
                 <Pane :onUpdateCategory="updateCategory" />
-                <template #node-custom="nodeProps">
-                    <CustomNode v-bind="nodeProps" />
-                </template>
-
-                <template #node-parent="nodeProps">
-                    <ParentNode v-bind="nodeProps" />
+                <template #node-customNode="nodeProps">
+                    <CustomNode
+                        v-bind="nodeProps"
+                        @update-node="handleNodeUpdate"
+                    />
                 </template>
             </VueFlow>
             <Sidebar :category="category" />
