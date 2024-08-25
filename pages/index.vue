@@ -109,17 +109,8 @@ function handleNodeUpdate(updatedData: any) {
 </template>
 
 <style>
-/* import the necessary styles for Vue Flow to work */
 @import '@vue-flow/core/dist/style.css';
-
-/* import the default theme, this is optional but generally recommended */
 @import '@vue-flow/core/dist/theme-default.css';
-
-/* import the required styles */
-/* @import '@vue-flow/core/dist/style.css'; */
-
-/* import the default theme (optional) */
-/* @import '@vue-flow/core/dist/theme-default.css'; */
 @import '@vue-flow/controls/dist/style.css';
 @import '@vue-flow/minimap/dist/style.css';
 @import '@vue-flow/node-resizer/dist/style.css';

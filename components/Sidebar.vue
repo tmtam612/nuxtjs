@@ -9,7 +9,6 @@ const props = defineProps(['category']);
 <template>
     <aside v-if="show">
         <div class="text-2xl bg-cyan-darken-1 pl-2 h-14">
-            <!-- <v-app-bar-nav-icon></v-app-bar-nav-icon> -->
             <v-btn
                 icon="mdi-close"
                 variant="text"
