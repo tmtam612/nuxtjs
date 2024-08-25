@@ -8,7 +8,7 @@
 
                 <v-btn
                     color="red"
-                    text="Save"
+                    text="Delete"
                     variant="elevated"
                     @click="deleteNode"
                 ></v-btn>
