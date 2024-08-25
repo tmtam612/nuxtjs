@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-const props = defineProps(['dialogVisible', 'infoDetail', 'isMileStone']);
+const props = defineProps(['dialogVisible', 'infoDetail', 'isMileStone', 'id']);
 const items = [
     { id: 1, name: 'California' },
     { id: 2, name: 'Colorado' },
@@ -16,7 +16,8 @@ const formData = ref({
     content: props.infoDetail.content ? props.infoDetail.content : '',
 });
 const formIsValid = ref(false);
-const emit = defineEmits(['closeDialog', 'updateData']);
+const openDeleteDialog = ref(false);
+const emit = defineEmits(['closeDialog', 'updateData', 'deleteNode']);
 const enableInput = ref(false);
 const rules = ref({
     required: (value) => !!value || 'Required.',
@@ -59,9 +60,19 @@ function handleUpdate(type, newValue) {
         formData.value[type] = newValue;
     }
 }
+const deleteNode = (id) => {
+    console.log(id);
+    emit('deleteNode', id);
+};
 </script>
 
 <template>
+    <DeleteDialog
+        :dialogVisible="openDeleteDialog"
+        @closeDialog="() => (openDeleteDialog = false)"
+        @deleteNode="deleteNode"
+        :id="id"
+    />
     <v-dialog
         transition="dialog-top-transition"
         width="700"
@@ -100,8 +111,8 @@ function handleUpdate(type, newValue) {
                                 >
                             </div>
                         </div>
-                        <div class="basis-1/6">
-                            <!-- <v-btn
+                        <!-- <div class="basis-1/6"> -->
+                        <!-- <v-btn
                                 v-if="
                                     !enableInput &&
                                     infoDetail.link &&
@@ -112,13 +123,21 @@ function handleUpdate(type, newValue) {
                                 :href="infoDetail.link"
                                 target="_blank"
                             ></v-btn> -->
-                        </div>
+                        <!-- </div> -->
                         <div class="basis-1/6">
                             <v-btn
                                 v-if="!enableInput"
                                 icon="mdi-pencil"
                                 variant="text"
                                 @click="enableInput = true"
+                            ></v-btn>
+                        </div>
+                        <div class="basis-1/6">
+                            <v-btn
+                                v-if="!enableInput"
+                                icon="mdi-delete"
+                                variant="text"
+                                @click="openDeleteDialog = true"
                             ></v-btn>
                         </div>
                     </div>

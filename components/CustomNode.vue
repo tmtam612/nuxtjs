@@ -5,9 +5,13 @@ import { NodeResizer } from '@vue-flow/node-resizer';
 import ContentDialog from './ContentDialog';
 const props = defineProps(['data', 'id']);
 const showDetail = ref(false);
-const emit = defineEmits(['update-node']);
+const emit = defineEmits(['update-node', 'deleteNode']);
 const closeDialog = () => {
     showDetail.value = false;
+};
+const deleteNode = (id) => {
+    console.log(id);
+    emit('deleteNode', id);
 };
 function updateData(form) {
     emit('update-node', { ...form, id: props.id });
@@ -22,6 +26,8 @@ function updateData(form) {
             :isMileStone="data.type === 'parent'"
             :infoDetail="data"
             @updateData="updateData"
+            @deleteNode="deleteNode"
+            :id="id"
         />
         <NodeResizer
             :minHeight="data.type === 'parent' ? 80 : 200"

@@ -58,6 +58,21 @@ function handleNodeUpdate(updatedData: any) {
         }
     }
 }
+const deleteNode = (id: string) => {
+    if (id && id !== '') {
+        elements.value = elements.value.filter(
+            (element: { id: string; source: string; target: string }) => {
+                if (element.source && element.source === id) {
+                    return false;
+                }
+                if (element.target && element.target === id) {
+                    return false;
+                }
+                return element.id !== id;
+            }
+        );
+    }
+};
 </script>
 
 <template>
@@ -87,6 +102,7 @@ function handleNodeUpdate(updatedData: any) {
                     <CustomNode
                         v-bind="nodeProps"
                         @update-node="handleNodeUpdate"
+                        @deleteNode="deleteNode"
                     />
                 </template>
             </VueFlow>
