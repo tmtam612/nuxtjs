@@ -51,7 +51,7 @@ const closeDialog = () => {
 const submitForm = () => {
     if (formIsValid.value) {
         emit('updateData', formData.value);
-        closeDialog();
+        enableInput.value = false;
     }
 };
 function handleUpdate(type, newValue) {
