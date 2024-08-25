@@ -5,13 +5,9 @@ import { response } from '../types';
 export default defineEventHandler(async (event) => {
     const result: response = { statusCode: 400, payload: null, message: '' };
     try {
-        // const graph = await prisma.roadmap.findUnique({
-        // 	where: {
-        // 		id: 1
-        // 	}
-        // });
+        const graphs = await prisma.graphs.findMany();
         result.statusCode = 200;
-        // result.payload = graph;
+        result.payload = graphs;
     } catch (err) {
         console.log(err);
         result.statusCode = 400;

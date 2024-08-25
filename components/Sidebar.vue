@@ -3,7 +3,7 @@ import useDragAndDrop from '../utils/useDnD';
 
 const { onDragStart } = useDragAndDrop();
 const show = ref(false);
-const props = defineProps(['category']);
+const props = defineProps(['graph']);
 </script>
 
 <template>
@@ -65,7 +65,7 @@ const props = defineProps(['category']);
             icon="mdi-pencil"
             @click="show = true"
             color="blue"
-            v-if="category"
+            v-if="graph"
         ></v-btn>
     </div>
 </template>

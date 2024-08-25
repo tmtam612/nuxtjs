@@ -6,9 +6,37 @@ import { useScreenshot } from '../utils/useScreenshot';
 const { onDragOver, onDrop, onDragLeave, isDragOver } = useDragAndDrop();
 const { capture } = useScreenshot();
 const { toObject, addEdges, onConnect, vueFlowRef, fromObject } = useVueFlow();
-const category = ref<number | null>(null);
-const updateCategory = (value: number) => {
-    category.value = value;
+const graph = ref<number | null>(null);
+const graphs = ref([]);
+interface response {
+    statusCode: number;
+    payload: any;
+    message: string;
+}
+const fetchGraphs = async () => {
+    const response: response = await $fetch('/api/get-graph', {
+        method: 'get',
+    });
+    graphs.value = response.payload;
+};
+await fetchGraphs();
+console.log(graphs);
+const updateGraph = async (value: number) => {
+    // graphs.value = value;
+    const response: response = await $fetch('/api/save-graph', {
+        method: 'post',
+        body: {
+            name: value,
+        },
+    });
+    await fetchGraphs();
+};
+const getDetailGraph = async (value: number) => {
+    // graphs.value = value;
+    const response: response = await $fetch(`/api/get-detail-graph/${value}`, {
+        method: 'get',
+    });
+    console.log(response);
 };
 async function onSave() {
     await $fetch('/api/save-graph', {
@@ -97,7 +125,11 @@ const deleteNode = (id: string) => {
                 >
                     <p v-if="isDragOver">Drop here</p>
                 </DropzoneBackground> -->
-                <Pane :onUpdateCategory="updateCategory" />
+                <Pane
+                    @updateGraph="updateGraph"
+                    :graphs="graphs"
+                    @getDetailGraph="getDetailGraph"
+                />
                 <template #node-customNode="nodeProps">
                     <CustomNode
                         v-bind="nodeProps"
@@ -106,7 +138,7 @@ const deleteNode = (id: string) => {
                     />
                 </template>
             </VueFlow>
-            <Sidebar :category="category" />
+            <Sidebar :graph="graph" />
             <v-snackbar v-model="snackbar" timeout="-1">
                 you have change the map, please press save to make sure save the
                 change

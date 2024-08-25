@@ -18,14 +18,17 @@ model nodes {
 }
 
 model graphs {
-  id        Int      @id @default(autoincrement())
-  UserID    String   @db.VarChar(256)
-  name      String   @db.VarChar(256)
-  createdAt DateTime
-  updatedAt DateTime
-  createdBy String   @db.VarChar(256)
-  updatedBy String   @db.VarChar(256)
-  deleted   Boolean
+  id          Int      @id @default(autoincrement())
+  UserID      String   @db.VarChar(256)
+  name        String   @db.VarChar(256)
+  createdAt   DateTime
+  updatedAt   DateTime
+  createdBy   String   @db.VarChar(256)
+  updatedBy   String   @db.VarChar(256)
+  deleted     Boolean
+  nodeID      Int?
+  edgeID      Int?
+  dimensionID Int?
 }
 
 model dimensions {

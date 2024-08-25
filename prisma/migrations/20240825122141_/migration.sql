@@ -24,6 +24,9 @@ CREATE TABLE "graphs" (
     "createdBy" VARCHAR(256) NOT NULL,
     "updatedBy" VARCHAR(256) NOT NULL,
     "deleted" BOOLEAN NOT NULL,
+    "nodeID" INTEGER NOT NULL,
+    "edgeID" INTEGER NOT NULL,
+    "dimensionID" INTEGER NOT NULL,
 
     CONSTRAINT "graphs_pkey" PRIMARY KEY ("id")
 );
