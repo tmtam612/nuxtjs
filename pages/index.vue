@@ -1,123 +1,209 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { VueFlow, useVueFlow } from '@vue-flow/core';
-import useDragAndDrop from '../utils/useDnD';
-import { useScreenshot } from '../utils/useScreenshot';
+import { ref } from "vue";
+import { VueFlow, useVueFlow } from "@vue-flow/core";
+import { useDragAndDrop, setId } from "../utils/useDnD";
+import { useScreenshot } from "../utils/useScreenshot";
+import type { GraphInterface, node } from "../types/graph.js";
+import type { response } from "../types/response.js";
 const { onDragOver, onDrop, onDragLeave, isDragOver } = useDragAndDrop();
 const { capture } = useScreenshot();
 const { toObject, addEdges, onConnect, vueFlowRef, fromObject } = useVueFlow();
-const graph = ref<number | null>(null);
+const graph = ref<GraphInterface | null>();
 const graphs = ref([]);
-interface response {
-    statusCode: number;
-    payload: any;
-    message: string;
-}
-const fetchGraphs = async () => {
-    const response: response = await $fetch('/api/get-graph', {
-        method: 'get',
-    });
-    graphs.value = response.payload;
-};
-await fetchGraphs();
-console.log(graphs);
-const updateGraph = async (value: number) => {
-    // graphs.value = value;
-    const response: response = await $fetch('/api/save-graph', {
-        method: 'post',
-        body: {
-            name: value,
-        },
-    });
-    await fetchGraphs();
-};
-const getDetailGraph = async (value: number) => {
-    // graphs.value = value;
-    const response: response = await $fetch(`/api/get-detail-graph/${value}`, {
-        method: 'get',
-    });
-    console.log(response);
-};
-async function onSave() {
-    await $fetch('/api/save-graph', {
-        method: 'post',
-        body: JSON.stringify(toObject()),
-    });
-    snackbar.value = false;
-}
 const elements = ref([]);
 const snackbar = ref(false);
+const openAddEditGraph = ref(false);
 onConnect((params) => {
-    addEdges([params]);
+	addEdges([params]);
 });
-function doScreenshot() {
-    if (!vueFlowRef.value) {
-        console.warn('VueFlow element not found');
-        return;
-    }
 
-    capture(vueFlowRef.value, { shouldDownload: true });
+const fetchGraphs = async () => {
+	try {
+		const response: response = await $fetch("/api/get-graphs", {
+			method: "get",
+		});
+		if (response.payload && response.statusCode === 200) {
+			graphs.value = response.payload;
+		}
+	} catch (err) {
+		console.log(err);
+	}
+};
+await fetchGraphs();
+
+const addGraph = async (value: number) => {
+	try {
+		const response: response = await $fetch("/api/save-graph", {
+			method: "post",
+			body: {
+				name: value,
+			},
+		});
+		if (response.payload && response.statusCode === 200) {
+			graph.value = response.payload;
+		}
+		await fetchGraphs();
+	} catch (err) {
+		console.log(err);
+	}
+};
+const getDetailGraph = async (value: number) => {
+	try {
+		if (!value) {
+			graph.value = null;
+			elements.value = [];
+			return true;
+		}
+		const response: response = await $fetch(
+			`/api/get-detail-graph/${value}`,
+			{
+				method: "get",
+			},
+		);
+		if (response.statusCode === 200 && response.payload) {
+			graph.value = response.payload;
+			if (
+				response.payload.currentNodeId &&
+				!isNaN(response.payload.currentNodeId)
+			) {
+				setId(response.payload.currentNodeId);
+			}
+			if (response.payload.detailGraph) {
+				fromObject(response.payload.detailGraph);
+			}
+		}
+	} catch (err) {
+		console.log(err);
+	}
+};
+async function onSave() {
+	try {
+		const content = toObject();
+		const { nodes, edges, ...dimensions } = content;
+		if (graph && graph.value && graph.value.id) {
+			await $fetch("/api/update-graph", {
+				method: "put",
+				body: {
+					id: graph.value.id,
+					name: graph.value.name,
+					nodes: nodes,
+					edges: edges,
+					dimensions: dimensions,
+				},
+			});
+			snackbar.value = false;
+		}
+	} catch (err) {
+		console.log(err);
+	}
+}
+
+function doScreenshot() {
+	if (!vueFlowRef.value) {
+		console.warn("VueFlow element not found");
+		return;
+	}
+
+	capture(vueFlowRef.value, {
+		shouldDownload: true,
+		backgroundColor: "white",
+	});
 }
 
 function onPaneChange(changes: any) {
-    if (changes && changes.length > 0 && !snackbar.value) {
-        if (changes[0].type !== 'select') {
-            snackbar.value = true;
-        }
-    }
+	if (changes && changes.length > 0 && !snackbar.value) {
+		if (changes[0].type !== "select" && changes[0].type !== "dimensions") {
+			snackbar.value = true;
+		}
+	}
 }
-interface node {
-    id: string;
-    type: string;
-    position: any;
-    data: any;
-}
+
 function handleNodeUpdate(updatedData: any) {
-    const nodes: Array<node> = elements.value.filter(
-        (item: node) => item.type === 'customNode'
-    );
-    if (nodes.length > 0) {
-        const node = nodes.find((n: node) => n.id === updatedData.id);
-        if (node) {
-            node.data = { ...node.data, ...updatedData };
-            if (!snackbar.value) {
-                snackbar.value = true;
-            }
-        }
-    }
+	try {
+		const nodes: Array<node> = elements.value.filter(
+			(item: node) => item.type === "customNode",
+		);
+		if (nodes.length > 0) {
+			const node = nodes.find((n: node) => n.id === updatedData.id);
+			if (node) {
+				node.data = { ...node.data, ...updatedData };
+				if (!snackbar.value) {
+					snackbar.value = true;
+				}
+			}
+		}
+	} catch (err) {
+		console.log(err);
+	}
 }
 const deleteNode = (id: string) => {
-    if (id && id !== '') {
-        elements.value = elements.value.filter(
-            (element: { id: string; source: string; target: string }) => {
-                if (element.source && element.source === id) {
-                    return false;
-                }
-                if (element.target && element.target === id) {
-                    return false;
-                }
-                return element.id !== id;
-            }
-        );
-    }
+	try {
+		if (id && id !== "") {
+			elements.value = elements.value.filter(
+				(element: { id: string; source: string; target: string }) => {
+					if (element.source && element.source === id) {
+						return false;
+					}
+					if (element.target && element.target === id) {
+						return false;
+					}
+					return element.id !== id;
+				},
+			);
+			if (!snackbar.value) {
+				snackbar.value = true;
+			}
+		}
+	} catch (err) {
+		console.log(err);
+	}
 };
+const deleteGraph = async () => {
+	try {
+		if (graph.value && graph.value.id) {
+			const response = await $fetch("/api/delete-graph", {
+				method: "put",
+				body: {
+					id: graph.value.id,
+				},
+			});
+			if (response.statusCode === 200) {
+				graph.value = null;
+				elements.value = [];
+				await fetchGraphs();
+			}
+		}
+	} catch (err) {
+		console.log(err);
+	}
+};
+const isEditGraph = ref(false);
 </script>
 
 <template>
-    <ClientOnly>
-        <div style="height: 100vh" class="dnd-flow" @drop="onDrop">
-            <VueFlow
-                :default-viewport="{ zoom: 0.8 }"
-                :max-zoom="4"
-                :min-zoom="0.1"
-                @dragover="(event: DragEvent) => onDragOver(event)"
-                @dragleave="onDragLeave"
-                auto-connect
-                @nodesChange="onPaneChange"
-                @edgesChange="onPaneChange"
-                v-model="elements"
-            >
-                <!-- <DropzoneBackground
+	<ClientOnly>
+		<div style="height: 100vh" class="dnd-flow" @drop="onDrop">
+			<AddEditGraph
+				@addGraph="addGraph"
+				@closeDialog="() => (openAddEditGraph = false)"
+				:dialogVisible="openAddEditGraph"
+				:edit="isEditGraph"
+				:graph="graph"
+				@editGraph="onSave"
+			/>
+			<VueFlow
+				:default-viewport="{ zoom: 0.8 }"
+				:max-zoom="4"
+				:min-zoom="0.1"
+				@dragover="(event: DragEvent) => onDragOver(event)"
+				@dragleave="onDragLeave"
+				auto-connect
+				@nodesChange="onPaneChange"
+				@edgesChange="onPaneChange"
+				v-model="elements"
+				class="screenshot-flow"
+			>
+				<!-- <DropzoneBackground
                     :style="{
                         backgroundColor: isDragOver ? '#e7f3ff' : 'transparent',
                         transition: 'background-color 0.2s ease',
@@ -125,70 +211,87 @@ const deleteNode = (id: string) => {
                 >
                     <p v-if="isDragOver">Drop here</p>
                 </DropzoneBackground> -->
-                <Pane
-                    @updateGraph="updateGraph"
-                    :graphs="graphs"
-                    @getDetailGraph="getDetailGraph"
-                />
-                <template #node-customNode="nodeProps">
-                    <CustomNode
-                        v-bind="nodeProps"
-                        @update-node="handleNodeUpdate"
-                        @deleteNode="deleteNode"
-                    />
-                </template>
-            </VueFlow>
-            <Sidebar :graph="graph" />
-            <v-snackbar v-model="snackbar" timeout="-1">
-                you have change the map, please press save to make sure save the
-                change
+				<Pane
+					:graphs="graphs"
+					@getDetailGraph="getDetailGraph"
+					:graph="graph"
+					@openAddGraph="
+						() => {
+							openAddEditGraph = true;
+							isEditGraph = false;
+						}
+					"
+				/>
+				<template #node-customNode="nodeProps">
+					<CustomNode
+						v-bind="nodeProps"
+						@update-node="handleNodeUpdate"
+						@deleteNode="deleteNode"
+					/>
+				</template>
+			</VueFlow>
+			<Sidebar
+				:graph="graph"
+				@download="doScreenshot"
+				@save="onSave"
+				@delete="deleteGraph"
+				@edit="
+					() => {
+						openAddEditGraph = true;
+						isEditGraph = true;
+					}
+				"
+			/>
+			<v-snackbar v-model="snackbar" timeout="-1">
+				you have change the map, please press save to make sure save the
+				change
 
-                <template v-slot:actions>
-                    <v-btn color="green" variant="text" @click="onSave">
-                        Save
-                    </v-btn>
-                    <v-btn color="red" variant="text" @click="snackbar = false">
-                        Close
-                    </v-btn>
-                </template>
-            </v-snackbar>
-        </div>
-    </ClientOnly>
+				<template v-slot:actions>
+					<v-btn color="green" variant="text" @click="onSave">
+						Save
+					</v-btn>
+					<v-btn color="red" variant="text" @click="snackbar = false">
+						Close
+					</v-btn>
+				</template>
+			</v-snackbar>
+		</div>
+	</ClientOnly>
 </template>
 
 <style>
-@import '@vue-flow/core/dist/style.css';
-@import '@vue-flow/core/dist/theme-default.css';
-@import '@vue-flow/controls/dist/style.css';
-@import '@vue-flow/minimap/dist/style.css';
-@import '@vue-flow/node-resizer/dist/style.css';
+@import "@vue-flow/core/dist/style.css";
+@import "@vue-flow/core/dist/theme-default.css";
+@import "@vue-flow/controls/dist/style.css";
+@import "@vue-flow/minimap/dist/style.css";
+@import "@vue-flow/node-resizer/dist/style.css";
 .background-image {
-    background-image: url('~/assets/img/background.svg');
-    background-size: contain;
+	background-image: url("~/assets/img/background.svg");
+	background-size: contain;
 }
 .vue-flow__minimap {
-    transform: scale(75%);
-    transform-origin: bottom right;
+	transform: scale(75%);
+	transform-origin: bottom right;
 }
 
 .dnd-flow {
-    flex-direction: column;
-    display: flex;
-    height: 100%;
+	flex-direction: column;
+	display: flex;
+	height: 100%;
 }
 
 .dnd-flow .vue-flow-wrapper {
-    flex-grow: 1;
-    height: 100%;
+	flex-grow: 1;
+	height: 100%;
 }
 
 @media screen and (min-width: 640px) {
-    .dnd-flow {
-        flex-direction: row;
-    }
+	.dnd-flow {
+		flex-direction: row;
+	}
 
-    .dnd-flow aside {
-        min-width: 15%;
-    }
+	.dnd-flow aside {
+		min-width: 15%;
+	}
 }
 </style>

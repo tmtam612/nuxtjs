@@ -8,11 +8,16 @@ export function useScreenshot(): UseScreenshot {
   const imgType = ref<ImageType>('png');
   const error = ref();
 
+  const filter = (node: HTMLElement) => {
+    const exclusionClasses = ["vue-flow__panel"];
+    return !exclusionClasses.some((classname) => node.classList?.contains(classname));
+  }
+
   async function capture(el: HTMLElement, options: UseScreenshotOptions = {}) {
     let data;
 
-    const fileName = options.fileName ?? `vue-flow-screenshot-${Date.now()}`;
-
+    const fileName = options.fileName ?? `roadmap-${Date.now()}`;
+    options.filter = filter;
     switch (options.type) {
       case 'jpeg':
         data = await toJpeg(el, options);

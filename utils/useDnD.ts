@@ -2,12 +2,14 @@ import { useVueFlow } from '@vue-flow/core';
 import { ref, watch } from 'vue';
 
 let id = 0;
-
+export function setId(value: number) {
+    id = ++value;
+}
 /**
  * @returns {string} - A unique id.
  */
-function getId(type: string) {
-    return `${type}_${id++}`;
+function getId() {
+    return `${id++}`;
 }
 
 /**
@@ -23,7 +25,7 @@ const state = {
     isDragging: ref(false),
 };
 
-export default function useDragAndDrop() {
+export function useDragAndDrop() {
     const { draggedType, isDragOver, isDragging } = state;
 
     const {
@@ -89,7 +91,7 @@ export default function useDragAndDrop() {
             y: event.clientY,
         });
 
-        const nodeId = getId(draggedType.value);
+        const nodeId = getId();
 
         const newNode = {
             id: nodeId,

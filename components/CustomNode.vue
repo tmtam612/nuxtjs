@@ -9,7 +9,7 @@ const emit = defineEmits(['update-node', 'deleteNode']);
 const closeDialog = () => {
     showDetail.value = false;
 };
-const deleteNode = (id) => {
+const deleteNode = () => {
     emit('deleteNode', id);
 };
 function updateData(form) {
@@ -26,7 +26,6 @@ function updateData(form) {
             :infoDetail="data"
             @updateData="updateData"
             @deleteNode="deleteNode"
-            :id="id"
         />
         <NodeResizer
             :minHeight="data.type === 'parent' ? 80 : 200"
