@@ -2,34 +2,15 @@
 import { Handle, Position } from '@vue-flow/core';
 import { ref } from 'vue';
 import { NodeResizer } from '@vue-flow/node-resizer';
-import ContentDialog from './ContentDialog';
 const props = defineProps(['data', 'id']);
-const showDetail = ref(false);
-const emit = defineEmits(['update-node', 'deleteNode']);
-const closeDialog = () => {
-    showDetail.value = false;
-};
-const deleteNode = () => {
-    emit('deleteNode', id);
-};
-function updateData(form) {
-    emit('update-node', { ...form, id: props.id });
-}
+const emit = defineEmits(['selectNode']);
 </script>
 
 <template>
     <div class="rounded-sm h-full content-node">
-        <ContentDialog
-            :dialogVisible="showDetail"
-            @closeDialog="closeDialog"
-            :isMileStone="data.type === 'parent'"
-            :infoDetail="data"
-            @updateData="updateData"
-            @deleteNode="deleteNode"
-        />
         <NodeResizer
-            :minHeight="data.type === 'parent' ? 80 : 200"
-            :minWidth="data.type === 'parent' ? 310 : 200"
+            :minHeight="data.isParent ? 80 : 200"
+            :minWidth="data.isParent ? 310 : 200"
             class="rounded-sm content-node"
         ></NodeResizer>
         <Handle
@@ -48,8 +29,8 @@ function updateData(form) {
             class="inline-flex h-full border-strong-black w-full"
             color="yellow"
             :ripple="false"
-            @click="showDetail = true"
-            v-if="data.type !== 'parent'"
+            @click="emit('selectNode')"
+            v-if="!data.isParent"
         >
             <template v-slot:title>
                 <div class="flex flex-row">
@@ -69,7 +50,7 @@ function updateData(form) {
                 <div class="block text-wrap break-words">
                     <span class="text-2xl">{{ data.content }}</span>
                 </div>
-                <div v-if="data.type !== 'parent'">
+                <div v-if="!data.isParent">
                     <v-list
                         :items="data.lessons"
                         class="bg-surface-light"
@@ -81,7 +62,7 @@ function updateData(form) {
             class="inline-flex h-full w-full"
             color="black"
             variant="outlined"
-            @click="showDetail = true"
+            @click="emit('selectNode')"
             :ripple="false"
             v-else
         >

@@ -103,7 +103,7 @@ export function useDragAndDrop() {
                 content: 'Here is information about the lesson',
                 lessons: [],
                 link: '',
-                type: draggedType.value,
+                isParent: draggedType.value === 'parent',
             },
         };
         /**
