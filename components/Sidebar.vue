@@ -2,7 +2,7 @@
 import { useDragAndDrop } from '../utils/useDnD';
 
 const { onDragStart } = useDragAndDrop();
-const show = ref(false);
+const show = ref(true);
 const props = defineProps(['graph']);
 const emit = defineEmits(['download', 'save', 'delete', 'edit']);
 const openDeleteDialog = ref(false);

@@ -10,7 +10,8 @@ const items = [
     { id: 5, name: 'Texas' },
     { id: 6, name: 'Wyoming' },
 ];
-const formData = ref({
+const setDefaultValue = () => {
+    return {
     id: props.infoDetail && props.infoDetail.id ? props.infoDetail.id : '',
     order_no:
         props.infoDetail && props.infoDetail.data.order_no
@@ -19,7 +20,7 @@ const formData = ref({
     lessons:
         props.infoDetail && props.infoDetail.data.lessons
             ? props.infoDetail.data.lessons
-            : '',
+            : [],
     title:
         props.infoDetail && props.infoDetail.data.title
             ? props.infoDetail.data.title
@@ -28,7 +29,9 @@ const formData = ref({
         props.infoDetail && props.infoDetail.data.content
             ? props.infoDetail.data.content
             : '',
-});
+}
+}
+const formData = ref(setDefaultValue());
 const formIsValid = ref(false);
 const openDeleteDialog = ref(false);
 const emit = defineEmits(['closeDialog', 'updateData', 'deleteNode']);
@@ -50,6 +53,10 @@ const closeDialog = () => {
     enableInput.value = false;
     internalDialogVisible.value = false;
 };
+const cancelEditing = () => {
+    formData.value = setDefaultValue();
+    enableInput.value = false;
+}
 const submitForm = () => {
     if (formIsValid.value) {
         emit('updateData', formData.value);
@@ -62,8 +69,10 @@ function handleUpdate(type, newValue) {
     }
 }
 const deleteNode = () => {
-    emit('deleteNode');
+    emit('deleteNode', formData.value.id);
+    emit('closeDialog');
 };
+const title = `Modify: ${ props.infoDetail.data.title }`;
 </script>
 
 <template>
@@ -95,16 +104,16 @@ const deleteNode = () => {
                             >
                                 <span class="text-3xl"
                                     >{{
-                                        infoDetail.data.order_no +
+                                        formData.order_no +
                                         '. ' +
-                                        infoDetail.data.title
+                                        formData.title
                                     }}<v-tooltip
                                         activator="parent"
                                         location="bottom"
                                         >{{
-                                            infoDetail.data.order_no +
+                                            formData.order_no +
                                             '. ' +
-                                            infoDetail.data.title
+                                            formData.title
                                         }}</v-tooltip
                                     ></span
                                 >
@@ -130,9 +139,7 @@ const deleteNode = () => {
                     <div v-else class="flex flex-row">
                         <div class="pl-5">
                             <div class="mt-2">
-                                <span class="text-3xl text-wrap break-words"
-                                    >Modify: {{ formData.title }}</span
-                                >
+                                <span class="text-3xl text-wrap break-words">{{ title }}</span>
                             </div>
                         </div>
                     </div>
@@ -190,14 +197,14 @@ const deleteNode = () => {
                         class="block whitespace-nowrap text-ellipsis overflow-hidden"
                     >
                         <span v-if="!enableInput" class="text-2xl"
-                            >{{ infoDetail.data.content }}
+                            >{{ formData.content }}
                             <v-tooltip activator="parent" location="bottom">{{
-                                infoDetail.data.content
+                                formData.content
                             }}</v-tooltip>
                         </span>
                         <div>
                             <v-list
-                                :items="infoDetail.data.lessons"
+                                :items="formData.lessons"
                                 v-if="!isMileStone && !enableInput"
                             ></v-list>
                         </div>
@@ -226,7 +233,7 @@ const deleteNode = () => {
                         color="red"
                         text="Cancel"
                         variant="elevated"
-                        @click="enableInput = false"
+                        @click="cancelEditing"
                     ></v-btn>
                 </v-card-actions>
             </v-card>
