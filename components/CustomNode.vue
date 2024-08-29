@@ -27,7 +27,7 @@ const emit = defineEmits(['selectNode']);
         />
         <v-card
             class="inline-flex h-full border-strong-black w-full"
-            color="yellow"
+            color="red"
             :ripple="false"
             @click="emit('selectNode')"
             v-if="!data.isParent"
@@ -60,8 +60,7 @@ const emit = defineEmits(['selectNode']);
         </v-card>
         <v-card
             class="inline-flex h-full w-full"
-            color="black"
-            variant="outlined"
+            color="green"
             @click="emit('selectNode')"
             :ripple="false"
             v-else

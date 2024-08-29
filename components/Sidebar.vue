@@ -66,8 +66,7 @@ const buttons = [
                 >
                     <v-card
                         class="m-auto inline-flex bg-white"
-                        color="black"
-                        variant="outlined"
+                        color="green"
                     >
                         <template v-slot:title>
                             <span class="">Milestone</span>
@@ -82,7 +81,7 @@ const buttons = [
                 >
                     <v-card
                         class="m-auto inline-flex border-strong-black"
-                        color="yellow"
+                        color="red"
                     >
                         <template v-slot:title>
                             <span class="">Content</span>

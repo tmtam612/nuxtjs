@@ -1,13 +1,18 @@
-import { PrismaClient } from '@prisma/client';
+import { graphs, PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 import { Node, response, Edge } from '../types';
 import moment from 'moment';
+interface DetailGraph extends graphs {
+    nodeID: number;
+    edgeID: number;
+    dimensionID: number;
+}
 export default defineEventHandler(async (event) => {
     const result: response = { statusCode: 400, payload: null, message: '' };
     try {
         const body = await readBody(event);
         const now = moment().format().toString();
-        const graphResponse = await prisma.graphs.findUnique({
+        const graphResponse: DetailGraph = await prisma.graphs.findUnique({
             where: {
                 id: body.id,
             },

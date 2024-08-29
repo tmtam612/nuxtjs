@@ -104,6 +104,7 @@ export function useDragAndDrop() {
                 lessons: [],
                 link: '',
                 isParent: draggedType.value === 'parent',
+                parentId: 0,
             },
         };
         /**

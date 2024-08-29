@@ -17,6 +17,14 @@ export interface node {
     position: any;
     data: nodeData;
 }
+export interface edge {
+    id: string;
+    source: string;
+    sourceHandle: string;
+    target: string;
+    targetHandle: string;
+    type: string;
+}
 
 export interface nodeData {
     title: string;
@@ -25,4 +33,5 @@ export interface nodeData {
     lessons: Array<any>;
     link: string;
     isParent: boolean;
+    parentId: number;
 }

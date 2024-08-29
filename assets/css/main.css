@@ -19,8 +19,16 @@
 .vue-flow__handle {
     background: transparent !important;
     border: none !important;
-    width: 20px !important;
-    height: 20px !important;
+    width: 30px !important;
+    height: 30px !important;
+    cursor: pointer !important;
+}
+.vue-flow__handle:hover {
+    background: grey !important;
+    border: none !important;
+    width: 30px !important;
+    height: 30px !important;
+    cursor: pointer !important;
 }
 .vue-flow__edge-path {
     stroke: black !important;

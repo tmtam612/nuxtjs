@@ -12,25 +12,25 @@ const items = [
 ];
 const setDefaultValue = () => {
     return {
-    id: props.infoDetail && props.infoDetail.id ? props.infoDetail.id : '',
-    order_no:
-        props.infoDetail && props.infoDetail.data.order_no
-            ? props.infoDetail.data.order_no
-            : '',
-    lessons:
-        props.infoDetail && props.infoDetail.data.lessons
-            ? props.infoDetail.data.lessons
-            : [],
-    title:
-        props.infoDetail && props.infoDetail.data.title
-            ? props.infoDetail.data.title
-            : '',
-    content:
-        props.infoDetail && props.infoDetail.data.content
-            ? props.infoDetail.data.content
-            : '',
-}
-}
+        id: props.infoDetail && props.infoDetail.id ? props.infoDetail.id : '',
+        order_no:
+            props.infoDetail && props.infoDetail.data.order_no
+                ? props.infoDetail.data.order_no
+                : '',
+        lessons:
+            props.infoDetail && props.infoDetail.data.lessons
+                ? props.infoDetail.data.lessons
+                : [],
+        title:
+            props.infoDetail && props.infoDetail.data.title
+                ? props.infoDetail.data.title
+                : '',
+        content:
+            props.infoDetail && props.infoDetail.data.content
+                ? props.infoDetail.data.content
+                : '',
+    };
+};
 const formData = ref(setDefaultValue());
 const formIsValid = ref(false);
 const openDeleteDialog = ref(false);
@@ -56,7 +56,7 @@ const closeDialog = () => {
 const cancelEditing = () => {
     formData.value = setDefaultValue();
     enableInput.value = false;
-}
+};
 const submitForm = () => {
     if (formIsValid.value) {
         emit('updateData', formData.value);
@@ -72,7 +72,7 @@ const deleteNode = () => {
     emit('deleteNode', formData.value.id);
     emit('closeDialog');
 };
-const title = `Modify: ${ props.infoDetail.data.title }`;
+const title = `Modify: ${props.infoDetail.data.title}`;
 </script>
 
 <template>
@@ -91,12 +91,12 @@ const title = `Modify: ${ props.infoDetail.data.title }`;
         <v-form ref="form" v-model="formIsValid">
             <v-card
                 class="m-auto inline-flex h-full border-strong-black w-full"
-                :color="!isMileStone ? (enableInput ? '' : 'yellow') : ''"
+                :color="!isMileStone ? (enableInput ? '' : 'red') : 'green'"
             >
                 <template v-slot:title>
                     <div class="flex flex-row" v-if="!enableInput">
                         <div
-                            class="basis-4/6 whitespace-nowrap text-ellipsis overflow-hidden"
+                            class="basis-10/12 whitespace-nowrap text-ellipsis overflow-hidden"
                         >
                             <div
                                 v-if="!enableInput"
@@ -119,7 +119,7 @@ const title = `Modify: ${ props.infoDetail.data.title }`;
                                 >
                             </div>
                         </div>
-                        <div class="basis-1/6">
+                        <div class="basis-1/12">
                             <v-btn
                                 v-if="!enableInput"
                                 icon="mdi-pencil"
@@ -127,7 +127,7 @@ const title = `Modify: ${ props.infoDetail.data.title }`;
                                 @click="enableInput = true"
                             ></v-btn>
                         </div>
-                        <div class="basis-1/6">
+                        <div class="basis-1/12">
                             <v-btn
                                 v-if="!enableInput"
                                 icon="mdi-delete"
@@ -139,7 +139,9 @@ const title = `Modify: ${ props.infoDetail.data.title }`;
                     <div v-else class="flex flex-row">
                         <div class="pl-5">
                             <div class="mt-2">
-                                <span class="text-3xl text-wrap break-words">{{ title }}</span>
+                                <span class="text-3xl text-wrap break-words">{{
+                                    title
+                                }}</span>
                             </div>
                         </div>
                     </div>
