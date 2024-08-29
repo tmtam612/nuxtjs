@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { onBeforeMount } from "vue";
-import type { response } from "../types/response.js";
-import type { GraphInterface, node, edge, nodeData } from "../types/graph.js";
-
-const nodes = ref<Array<node>>([]);
+import type { node } from "../types/graph.js";
+const emit = defineEmits(['openRoadmap']);
+const props = defineProps(['nodes']);
+const timelineItem = ref<Array<node>>([]);
 const arrangeNodes = (parentNodes: Array<node>, childrenNodes: Array<node>) => {
 	const result: Array<node> = [];
 	const nodeLength = parentNodes.length + childrenNodes.length;
@@ -46,48 +46,34 @@ const getChildrenNodes = (nodes: Array<node>) => {
 				a.data.order_no - b.data.order_no,
 		);
 };
-const getDetailGraph = async (value: number) => {
+onBeforeMount(() => {
 	try {
-		const response: response = await $fetch(
-			`/api/get-detail-graph/${value}`,
-			{
-				method: "get",
-			},
-		);
-		if (
-			response.statusCode === 200 &&
-			response.payload &&
-			response.payload.detailGraph &&
-			response.payload.detailGraph.nodes
-		) {
-			const items = response.payload.detailGraph.nodes;
-			const parentNodes = getParentNodes(items);
-			const childrenNodes = getChildrenNodes(items);
-			nodes.value = arrangeNodes(parentNodes, childrenNodes);
-		}
-	} catch (err) {
-		console.log(err);
-	}
-};
-onBeforeMount(async () => {
-	try {
-		await getDetailGraph(29);
+        if (props.nodes) {
+            const parentNodes = getParentNodes(props.nodes);
+            const childrenNodes = getChildrenNodes(props.nodes);
+            timelineItem.value = arrangeNodes(parentNodes, childrenNodes);
+        }
 	} catch (err) {
 		console.log(err);
 	}
 });
+
 </script>
 <template>
 	<div class="container h-full m-auto">
+		<div class="fixed left-5 top-1 mt-1 z-10" @click="() => emit('openRoadmap')"><v-btn icon="mdi-arrow-left"></v-btn></div>
 		<v-timeline side="end">
 			<v-timeline-item
-				v-for="(node, key) in nodes"
+				v-for="(node, key) in timelineItem"
 				:key="key"
-				:dot-color="node.data.isParent ? 'green' : 'red'"
-				:icon="node.data.isParent ? 'mdi-book-variant' : 'mdi-star'"
+				:dot-color="node.data.isParent ? 'green' : 'white'"
+				:icon="node.data.isParent ? 'mdi-book-variant' : ''"
 				fill-dot
 				size="small"
 			>
+            <template v-slot:icon v-if="!node.data.isParent">
+                <v-checkbox class="pt-5 mr-10" :model-value="node.data.done" readonly color="success"></v-checkbox>
+            </template>
 				<template v-slot:opposite>
 					<div
 						align="right"
@@ -100,23 +86,26 @@ onBeforeMount(async () => {
 						}}</v-tooltip>
 					</div>
 				</template>
-				<v-card v-if="!node.data.isParent" class="custom-width h-auto h-full">
+				<v-card
+					v-if="!node.data.isParent"
+					class="custom-width h-auto h-full"
+				>
 					<v-card-title
 						class="text-h6 bg-red custom-width whitespace-nowrap text-ellipsis overflow-hidden"
 					>
 						{{ node.data.title }}
-						<v-tooltip activator="parent" location="bottom">{{ node.data.title }}</v-tooltip>
+						<v-tooltip activator="parent" location="bottom">{{
+							node.data.title
+						}}</v-tooltip>
 					</v-card-title>
-					<v-card-text
-						class="bg-white text--primary overflow-hidden"
-					>
+					<v-card-text class="bg-white text--primary overflow-hidden">
 						{{ node.data.content }}
 						<div>
 							<v-list :items="node.data.lessons"></v-list>
 						</div>
 						<v-tooltip activator="parent" location="bottom">
-                            {{ node.data.content}}
-                            <v-list
+							{{ node.data.content }}
+							<v-list
 								:items="node.data.lessons"
 								class="bg-transparent"
 							></v-list

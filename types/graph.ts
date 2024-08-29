@@ -34,4 +34,5 @@ export interface nodeData {
     link: string;
     isParent: boolean;
     parentId: number;
+    done: boolean;
 }

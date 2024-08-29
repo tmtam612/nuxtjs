@@ -4,7 +4,7 @@ import { useDragAndDrop } from '../utils/useDnD';
 const { onDragStart } = useDragAndDrop();
 const show = ref(true);
 const props = defineProps(['graph']);
-const emit = defineEmits(['download', 'save', 'delete', 'edit']);
+const emit = defineEmits(['download', 'save', 'delete', 'edit', 'openTimeLine']);
 const openDeleteDialog = ref(false);
 const deleteGraph = () => {
     emit('delete');
@@ -33,6 +33,12 @@ const buttons = [
         color: 'red',
         emitAction: () => (openDeleteDialog.value = true),
         icon: 'mdi-trash-can',
+    },
+    {
+        text: 'timeline',
+        color: 'yellow',
+        emitAction: () => emit('openTimeLine'),
+        icon: 'mdi-railroad-light',
     },
 ];
 </script>

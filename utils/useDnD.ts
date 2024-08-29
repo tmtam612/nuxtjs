@@ -48,7 +48,7 @@ export function useDragAndDrop() {
 
         draggedType.value = type;
         isDragging.value = true;
-
+        console.log(event);
         document.addEventListener('drop', onDragEnd);
     }
 
@@ -105,6 +105,7 @@ export function useDragAndDrop() {
                 link: '',
                 isParent: draggedType.value === 'parent',
                 parentId: 0,
+                done: false
             },
         };
         /**
